@@ -1,0 +1,21 @@
+message msg_type1:
+    report ram ram_interface_name1
+    FIELDNAME1: 0(3:0) & 2(5) & 1
+    FIELDNAME2: 1(4:0) & 0(3:3)
+    
+message msg_type2:
+    FIELDNAME2: 1(4:0) & 0(3:3)
+    
+message msg_type1_1 is msg_type1:
+    report record record_name1_1
+    FIELDNAME1_1: 4 & 5
+    FIELDNAME1_2: 13(5:0) & 15(3:5)
+    FIELDNAME1 = 13h'1ABC
+    FIELDNAME1_1 = 16b'11000101001111
+    output FIELDNAME1_2
+
+message msg_type2_1 is msg_type2:
+    report record record_name2_1
+    FIELDNAME2_1: 6 & 8(1:0) & 9(0:0)
+    FIELDNAME2 = 9h'F5
+    output FIELDNAME2_1
