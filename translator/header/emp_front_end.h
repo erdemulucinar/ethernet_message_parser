@@ -1,5 +1,5 @@
-#ifndef EMP_H
-#define EMP_H
+#ifndef EMP_FRONT_END_H
+#define EMP_FRONT_END_H
 
 #include "string.h"
 #include <stdlib.h>
