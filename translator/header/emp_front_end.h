@@ -58,6 +58,7 @@ ListNode* collectRawMessages(char* file);
 //List functions
 void listAdd(ListNode *head, void *data);
 void listCombine(ListNode *head1, ListNode *head2);
+int listLen(ListNode *head);
 
 //Utility Functions
 char* copyStr(char* str);

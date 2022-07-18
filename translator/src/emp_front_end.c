@@ -46,6 +46,18 @@ void listCombine(ListNode *head1, ListNode *head2){
     head1->next = head2;
 }
 
+int listLen(ListNode *head){
+    int len;
+    
+    len = 0;
+    while(head){
+        head = head->next;
+        len = len + 1;
+    }
+    
+    return len;
+}
+
 //------------------------------------------------------------------------
 //---------------------------UTILITY FUNCTIONS----------------------------
 //------------------------------------------------------------------------
