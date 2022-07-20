@@ -3,6 +3,9 @@
 
 #include "emp_data_structures.h"
 
+//0.Common
+char* copyStr(char* str);
+
 //1.Data structures
 
 //Returns the compare result of two bitIdx sets. When set1 spans a range
