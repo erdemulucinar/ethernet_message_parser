@@ -440,8 +440,8 @@ static const yytype_int8 yyrhs[] =
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    48,    48,    52,    58,    64,    72,    76,    83,    87,
-      91,    95,    99,   106,   111
+       0,    48,    48,    54,    60,    66,    74,    78,    85,    89,
+      93,    97,   101,   108,   113
 };
 #endif
 
@@ -1361,20 +1361,22 @@ yyreduce:
         case 2:
 #line 48 "flex_bison/defs/emp.y"
     {
-        *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        if(!(*msgList)){
+            *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        }
         appendLinkedList(*msgList, (void*) (yyvsp[(1) - (1)].msg));
     ;}
     break;
 
   case 3:
-#line 52 "flex_bison/defs/emp.y"
+#line 54 "flex_bison/defs/emp.y"
     {
         appendLinkedList(*msgList, (void*) (yyvsp[(2) - (2)].msg));
     ;}
     break;
 
   case 4:
-#line 59 "flex_bison/defs/emp.y"
+#line 61 "flex_bison/defs/emp.y"
     {
         (yyvsp[(6) - (6)].msg)->name = (yyvsp[(2) - (6)].id);
         (yyvsp[(6) - (6)].msg)->parent = (yyvsp[(4) - (6)].id);
@@ -1383,7 +1385,7 @@ yyreduce:
     break;
 
   case 5:
-#line 65 "flex_bison/defs/emp.y"
+#line 67 "flex_bison/defs/emp.y"
     {
         (yyvsp[(4) - (4)].msg)->name = (yyvsp[(2) - (4)].id);
         (yyval.msg) = (yyvsp[(4) - (4)].msg);
@@ -1391,56 +1393,56 @@ yyreduce:
     break;
 
   case 6:
-#line 73 "flex_bison/defs/emp.y"
+#line 75 "flex_bison/defs/emp.y"
     {
         (yyval.msg) = addLine(0, (yyvsp[(1) - (1)].msgLine));
     ;}
     break;
 
   case 7:
-#line 77 "flex_bison/defs/emp.y"
+#line 79 "flex_bison/defs/emp.y"
     {
         (yyval.msg) = addLine((yyvsp[(1) - (2)].msg), (yyvsp[(2) - (2)].msgLine));
     ;}
     break;
 
   case 8:
-#line 84 "flex_bison/defs/emp.y"
+#line 86 "flex_bison/defs/emp.y"
     {
         (yyval.msgLine) = createReportInterface(REPORT_RAM, (yyvsp[(3) - (3)].id));
     ;}
     break;
 
   case 9:
-#line 88 "flex_bison/defs/emp.y"
+#line 90 "flex_bison/defs/emp.y"
     {
         (yyval.msgLine) = createReportInterface(REPORT_RECORD, (yyvsp[(3) - (3)].id));
     ;}
     break;
 
   case 10:
-#line 92 "flex_bison/defs/emp.y"
+#line 94 "flex_bison/defs/emp.y"
     {
         (yyval.msgLine) = createMsgField((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].bitFieldList));
     ;}
     break;
 
   case 11:
-#line 96 "flex_bison/defs/emp.y"
+#line 98 "flex_bison/defs/emp.y"
     {
         (yyval.msgLine) = createMatchCondition((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].val));
     ;}
     break;
 
   case 12:
-#line 100 "flex_bison/defs/emp.y"
+#line 102 "flex_bison/defs/emp.y"
     {
         (yyval.msgLine) = createReportField((yyvsp[(2) - (2)].id));
     ;}
     break;
 
   case 13:
-#line 107 "flex_bison/defs/emp.y"
+#line 109 "flex_bison/defs/emp.y"
     {
         (yyval.bitFieldList) = createLinkedList(&copyRef, &deleteBitField, &compareBitField);
         appendLinkedList((yyval.bitFieldList), (void*) (yyvsp[(1) - (1)].bitField));
@@ -1448,7 +1450,7 @@ yyreduce:
     break;
 
   case 14:
-#line 112 "flex_bison/defs/emp.y"
+#line 114 "flex_bison/defs/emp.y"
     {
         appendLinkedList((yyvsp[(1) - (3)].bitFieldList), (void*) (yyvsp[(3) - (3)].bitField));
         (yyval.bitFieldList) = (yyvsp[(1) - (3)].bitFieldList);
@@ -1457,7 +1459,7 @@ yyreduce:
 
 
 /* Line 1267 of yacc.c.  */
-#line 1461 "emp.tab.c"
+#line 1463 "emp.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1671,7 +1673,7 @@ yyreturn:
 }
 
 
-#line 118 "flex_bison/defs/emp.y"
+#line 120 "flex_bison/defs/emp.y"
 
 
 void yyerror(LinkedList **msgList, char const *s) {

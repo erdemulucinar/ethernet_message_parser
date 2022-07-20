@@ -821,16 +821,13 @@ case 11:
 YY_RULE_SETUP
 #line 19 "flex_bison/defs/emp.l"
 {
-                                char *str;
-                                str = malloc(strlen(yytext)*sizeof(char));
-                                strcpy(str,yytext);
-                                yylval.id = str;
+                                yylval.id = copyStr(yytext);
                                 return ID;
                             }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 26 "flex_bison/defs/emp.l"
+#line 23 "flex_bison/defs/emp.l"
 {
                                 yylval.val = hex2num(yytext);
                                 return NUMBER;
@@ -838,7 +835,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 30 "flex_bison/defs/emp.l"
+#line 27 "flex_bison/defs/emp.l"
 {
                                 yylval.val = bin2num(yytext);
                                 return NUMBER;
@@ -846,7 +843,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 34 "flex_bison/defs/emp.l"
+#line 31 "flex_bison/defs/emp.l"
 {
                                 yylval.val = dec2num(yytext);
                                 return NUMBER;
@@ -854,7 +851,7 @@ YY_RULE_SETUP
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 38 "flex_bison/defs/emp.l"
+#line 35 "flex_bison/defs/emp.l"
 {
                                 yylval.bitField = collectBitField(yytext);
                                 return BIT_FIELD;
@@ -862,15 +859,15 @@ YY_RULE_SETUP
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 42 "flex_bison/defs/emp.l"
+#line 39 "flex_bison/defs/emp.l"
 {printf("Unrecognized Symbol: %s",yytext);}
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 43 "flex_bison/defs/emp.l"
+#line 40 "flex_bison/defs/emp.l"
 ECHO;
 	YY_BREAK
-#line 873 "emp.lex.c"
+#line 870 "emp.lex.c"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -1875,6 +1872,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 43 "flex_bison/defs/emp.l"
+#line 40 "flex_bison/defs/emp.l"
 
 

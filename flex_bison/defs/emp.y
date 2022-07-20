@@ -46,7 +46,9 @@ void yyerror(LinkedList **msgList, const char *s);
 
 msg_def_list:
     msg_def{
-        *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        if(!(*msgList)){
+            *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        }
         appendLinkedList(*msgList, (void*) $1);
     }
     | msg_def_list msg_def{
