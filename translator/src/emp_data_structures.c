@@ -159,6 +159,7 @@ void deleteMsg(void *data){
     
     safe_free(msg->name);
     safe_free(msg->parent);
+    safe_free(msg->reportInterface->interfaceName);
     safe_free(msg->reportInterface);
     flushLinkedList(msg->msgFields);
     flushLinkedList(msg->matchConditions);

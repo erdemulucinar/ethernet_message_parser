@@ -17,10 +17,7 @@
 "&"                         {return COMBINE;}
 "="                         {return EQ;}
 [a-zA-Z][a-zA-Z_0-9]*       {
-                                char *str;
-                                str = malloc(strlen(yytext)*sizeof(char));
-                                strcpy(str,yytext);
-                                yylval.id = str;
+                                yylval.id = copyStr(yytext);
                                 return ID;
                             }
 [1-9]+[0-9]*h'[0-9A-Fa-f]+  {
