@@ -18,4 +18,5 @@ message msg_type2_1 is msg_type2:
     report record record_name2_1
     FIELDNAME2_1: 6 & 8(1:0) & 9(0:0)
     FIELDNAME2 = 9h'F5
+    FIELDNAME33 = 6d'153
     output FIELDNAME2_1

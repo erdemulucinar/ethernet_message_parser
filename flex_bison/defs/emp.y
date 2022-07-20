@@ -1,22 +1,24 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
-#include "emp_front_end.h"
+#include "emp_data_structures.h"
+#include "emp_util.h"
 int yylex(void);
-void yyerror(ListNode **msgList, const char *s);
+void yyerror(LinkedList **msgList, const char *s);
 %}
 
 //Directives
-%parse-param {ListNode **msgList}
+%parse-param {LinkedList **msgList}
 
 %union {
     //Lexer
     char *id; //An ID's c-string representation.
+    char *val; //Binary representation of a match condition's value.
+    BitField *bitField;
     //Parser
-    ListNode *bitFieldList;
-    Line *line;
-    ListNode *msgLineList;
-    RawMsg *msg;
+    LinkedList *bitFieldList;
+    MsgLine *msgLine;
+    Msg *msg;
 }
 
 //Keywords
@@ -32,135 +34,89 @@ void yyerror(ListNode **msgList, const char *s);
 %token EQ                       //"="
 //Variables
 %token <id> ID                  //Any string which starts with a letter
-%token <id> NUMBER              //Any number (Lexer transforms hex&dec to binary)
-%token <id> BIT_FIELD           //Any bitfield defined as in "emp.h"
+%token <val> NUMBER             //Any number (Lexer transforms hex&dec to binary)
+%token <bitField> BIT_FIELD     //Any bitfield as defined in "emp_data_structure.h"
 
 %type <bitFieldList> field_vector_indices
-%type <line> msg_line
-%type <msgLineList> msg_line_list
+%type <msgLine> msg_line
+%type <msg> msg_line_list
 %type <msg> msg_def
 
 %%
 
 msg_def_list:
     msg_def{
-        *msgList = malloc(sizeof(ListNode));
-        (*msgList)->data = (void*) $1;
-        (*msgList)->next = 0;
+        *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        appendLinkedList(*msgList, (void*) $1);
     }
     | msg_def_list msg_def{
-        listAdd(*msgList,(void*) $2);
+        appendLinkedList(*msgList, (void*) $2);
     }
     ;
     
 msg_def:
     MESSAGE ID IS ID DEF msg_line_list
     {
-        $$ = malloc(sizeof(RawMsg));
-        $$->name = $2;
-        $$->parent = $4;
-        $$->lineList = $6;
+        $6->name = $2;
+        $6->parent = $4;
+        $$ = $6;
     }
     | MESSAGE ID DEF msg_line_list
     {
-        $$ = malloc(sizeof(RawMsg));
-        $$->name = $2;
-        $$->parent = 0;
-        $$->lineList = $4;
+        $4->name = $2;
+        $$ = $4;
     }
     ;
 
 msg_line_list:
     msg_line
     {
-        $$ = malloc(sizeof(ListNode));
-        $$->data = (void*) $1;
-        $$->next = 0;
+        $$ = addLine(0, $1);
     }
     | msg_line_list msg_line
     {
-        listAdd($1,(void*) $2);
-        $$ = $1;
+        $$ = addLine($1, $2);
     }
     ;
 
 msg_line:
     REPORT RAM ID //Report RAM interface
     {
-        ReportInterface *reportInterface;
-        reportInterface = malloc(sizeof(ReportInterface));
-        reportInterface->reportType = REPORT_RAM;
-        reportInterface->name = $3;
-        
-        $$ = malloc(sizeof(Line));
-        $$->lineType = REPORT_INTERFACE;
-        $$->data = (void*) reportInterface;
+        $$ = createReportInterface(REPORT_RAM, $3);
     }
     | REPORT RECORD ID //Report record interface
     {
-        ReportInterface *reportInterface;
-        reportInterface = malloc(sizeof(ReportInterface));
-        reportInterface->reportType = REPORT_RECORD;
-        reportInterface->name = $3;
-        
-        $$ = malloc(sizeof(Line));
-        $$->lineType = REPORT_INTERFACE;
-        $$->data = (void*) reportInterface;
-    }
-    | ID EQ NUMBER //Control field definition
-    {
-        ControlFieldDef *controlDef;
-        controlDef = malloc(sizeof(ControlFieldDef));
-        controlDef->name = $1;
-        controlDef->val = num2bin($3);
-        
-        $$ = malloc(sizeof(Line));
-        $$->lineType = CONTROL_FIELD_DEF;
-        $$->data = (void*) controlDef;
-    }
-    | OUTPUT ID //Report field definition
-    {
-        ReportFieldDef *reportDef;
-        reportDef = malloc(sizeof(ReportFieldDef));
-        reportDef->name = $2;
-        
-        $$ = malloc(sizeof(Line));
-        $$->lineType = REPORT_FIELD_DEF;
-        $$->data = (void*) reportDef;
+        $$ = createReportInterface(REPORT_RECORD, $3);
     }
     | ID DEF field_vector_indices //Message field definition
     {
-        MsgFieldDef *fieldDef;
-        fieldDef = malloc(sizeof(MsgFieldDef));
-        fieldDef->name = $1;
-        fieldDef->bitFields = $3;
-        
-        $$ = malloc(sizeof(Line));
-        $$->lineType = MSG_FIELD_DEF;
-        $$->data = (void*) fieldDef;
+        $$ = createMsgField($1, $3);
+    }
+    | ID EQ NUMBER //Match condition definition
+    {
+        $$ = createMatchCondition($1, $3);
+    }
+    | OUTPUT ID //Report field definition
+    {
+        $$ = createReportField($2);
     }
     ;
 
 field_vector_indices:
     BIT_FIELD
     {
-        BitField *bitField;
-        bitField = collectBitField($1);
-        $$ = malloc(sizeof(ListNode));
-        $$->data = (void*) bitField;
-        $$->next = 0;
+        $$ = createLinkedList(&copyRef, &deleteBitField, &compareBitField);
+        appendLinkedList($$, (void*) $1);
     }
     | field_vector_indices COMBINE BIT_FIELD
     {
-        BitField *bitField;
-        bitField = collectBitField($3);
-        listAdd($1, (void*) bitField);
+        appendLinkedList($1, (void*) $3);
         $$ = $1;
     }
     ;
 
 %%
 
-void yyerror(ListNode **msgList, char const *s) {
+void yyerror(LinkedList **msgList, char const *s) {
     fprintf(stderr, "%s\n", s);
 }

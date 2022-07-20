@@ -102,9 +102,10 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-#include "emp_front_end.h"
+#include "emp_data_structures.h"
+#include "emp_util.h"
 int yylex(void);
-void yyerror(ListNode **msgList, const char *s);
+void yyerror(LinkedList **msgList, const char *s);
 
 
 /* Enabling traces.  */
@@ -127,18 +128,19 @@ void yyerror(ListNode **msgList, const char *s);
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 12 "flex_bison/defs/emp.y"
+#line 13 "flex_bison/defs/emp.y"
 {
     //Lexer
     char *id; //An ID's c-string representation.
+    char *val; //Binary representation of a match condition's value.
+    BitField *bitField;
     //Parser
-    ListNode *bitFieldList;
-    Line *line;
-    ListNode *msgLineList;
-    RawMsg *msg;
+    LinkedList *bitFieldList;
+    MsgLine *msgLine;
+    Msg *msg;
 }
 /* Line 193 of yacc.c.  */
-#line 142 "emp.tab.c"
+#line 144 "emp.tab.c"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
@@ -151,7 +153,7 @@ typedef union YYSTYPE
 
 
 /* Line 216 of yacc.c.  */
-#line 155 "emp.tab.c"
+#line 157 "emp.tab.c"
 
 #ifdef short
 # undef short
@@ -422,7 +424,7 @@ static const yytype_uint8 yytranslate[] =
 static const yytype_uint8 yyprhs[] =
 {
        0,     0,     3,     5,     8,    15,    20,    22,    25,    29,
-      33,    37,    40,    44,    46
+      33,    37,    41,    44,    46
 };
 
 /* YYRHS -- A `-1'-separated list of the rules' RHS.  */
@@ -431,15 +433,15 @@ static const yytype_int8 yyrhs[] =
       16,     0,    -1,    17,    -1,    16,    17,    -1,     3,    12,
        4,    12,     9,    18,    -1,     3,    12,     9,    18,    -1,
       19,    -1,    18,    19,    -1,     5,     6,    12,    -1,     5,
-       7,    12,    -1,    12,    11,    13,    -1,     8,    12,    -1,
-      12,     9,    20,    -1,    14,    -1,    20,    10,    14,    -1
+       7,    12,    -1,    12,     9,    20,    -1,    12,    11,    13,
+      -1,     8,    12,    -1,    14,    -1,    20,    10,    14,    -1
 };
 
 /* YYRLINE[YYN] -- source line where rule number YYN was defined.  */
 static const yytype_uint8 yyrline[] =
 {
-       0,    46,    46,    51,    57,    64,    74,    80,    88,    99,
-     110,   121,   131,   145,   153
+       0,    48,    48,    52,    58,    64,    72,    76,    83,    87,
+      91,    95,    99,   106,   111
 };
 #endif
 
@@ -476,7 +478,7 @@ static const yytype_uint8 yyr1[] =
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     1,     2,     6,     4,     1,     2,     3,     3,
-       3,     2,     3,     1,     3
+       3,     3,     2,     1,     3
 };
 
 /* YYDEFACT[STATE-NAME] -- Default rule to reduce with in state
@@ -485,8 +487,8 @@ static const yytype_uint8 yyr2[] =
 static const yytype_uint8 yydefact[] =
 {
        0,     0,     0,     2,     0,     1,     3,     0,     0,     0,
-       0,     0,     0,     5,     6,     0,     0,     0,    11,     0,
-       0,     7,     4,     8,     9,    13,    12,    10,     0,    14
+       0,     0,     0,     5,     6,     0,     0,     0,    12,     0,
+       0,     7,     4,     8,     9,    13,    10,    11,     0,    14
 };
 
 /* YYDEFGOTO[NTERM-NUM].  */
@@ -663,14 +665,14 @@ do {									  \
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, ListNode **msgList)
+yy_symbol_value_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, LinkedList **msgList)
 #else
 static void
 yy_symbol_value_print (yyoutput, yytype, yyvaluep, msgList)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    ListNode **msgList;
+    LinkedList **msgList;
 #endif
 {
   if (!yyvaluep)
@@ -697,14 +699,14 @@ yy_symbol_value_print (yyoutput, yytype, yyvaluep, msgList)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, ListNode **msgList)
+yy_symbol_print (FILE *yyoutput, int yytype, YYSTYPE const * const yyvaluep, LinkedList **msgList)
 #else
 static void
 yy_symbol_print (yyoutput, yytype, yyvaluep, msgList)
     FILE *yyoutput;
     int yytype;
     YYSTYPE const * const yyvaluep;
-    ListNode **msgList;
+    LinkedList **msgList;
 #endif
 {
   if (yytype < YYNTOKENS)
@@ -752,13 +754,13 @@ do {								\
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yy_reduce_print (YYSTYPE *yyvsp, int yyrule, ListNode **msgList)
+yy_reduce_print (YYSTYPE *yyvsp, int yyrule, LinkedList **msgList)
 #else
 static void
 yy_reduce_print (yyvsp, yyrule, msgList)
     YYSTYPE *yyvsp;
     int yyrule;
-    ListNode **msgList;
+    LinkedList **msgList;
 #endif
 {
   int yynrhs = yyr2[yyrule];
@@ -1031,14 +1033,14 @@ yysyntax_error (char *yyresult, int yystate, int yychar)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 static void
-yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, ListNode **msgList)
+yydestruct (const char *yymsg, int yytype, YYSTYPE *yyvaluep, LinkedList **msgList)
 #else
 static void
 yydestruct (yymsg, yytype, yyvaluep, msgList)
     const char *yymsg;
     int yytype;
     YYSTYPE *yyvaluep;
-    ListNode **msgList;
+    LinkedList **msgList;
 #endif
 {
   YYUSE (yyvaluep);
@@ -1067,7 +1069,7 @@ int yyparse ();
 #endif
 #else /* ! YYPARSE_PARAM */
 #if defined __STDC__ || defined __cplusplus
-int yyparse (ListNode **msgList);
+int yyparse (LinkedList **msgList);
 #else
 int yyparse ();
 #endif
@@ -1104,11 +1106,11 @@ yyparse (YYPARSE_PARAM)
 #if (defined __STDC__ || defined __C99__FUNC__ \
      || defined __cplusplus || defined _MSC_VER)
 int
-yyparse (ListNode **msgList)
+yyparse (LinkedList **msgList)
 #else
 int
 yyparse (msgList)
-    ListNode **msgList;
+    LinkedList **msgList;
 #endif
 #endif
 {
@@ -1357,151 +1359,105 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 46 "flex_bison/defs/emp.y"
+#line 48 "flex_bison/defs/emp.y"
     {
-        *msgList = malloc(sizeof(ListNode));
-        (*msgList)->data = (void*) (yyvsp[(1) - (1)].msg);
-        (*msgList)->next = 0;
+        *msgList = createLinkedList(&copyRef, &deleteMsg, &compareMsg);
+        appendLinkedList(*msgList, (void*) (yyvsp[(1) - (1)].msg));
     ;}
     break;
 
   case 3:
-#line 51 "flex_bison/defs/emp.y"
+#line 52 "flex_bison/defs/emp.y"
     {
-        listAdd(*msgList,(void*) (yyvsp[(2) - (2)].msg));
+        appendLinkedList(*msgList, (void*) (yyvsp[(2) - (2)].msg));
     ;}
     break;
 
   case 4:
-#line 58 "flex_bison/defs/emp.y"
+#line 59 "flex_bison/defs/emp.y"
     {
-        (yyval.msg) = malloc(sizeof(RawMsg));
-        (yyval.msg)->name = (yyvsp[(2) - (6)].id);
-        (yyval.msg)->parent = (yyvsp[(4) - (6)].id);
-        (yyval.msg)->lineList = (yyvsp[(6) - (6)].msgLineList);
+        (yyvsp[(6) - (6)].msg)->name = (yyvsp[(2) - (6)].id);
+        (yyvsp[(6) - (6)].msg)->parent = (yyvsp[(4) - (6)].id);
+        (yyval.msg) = (yyvsp[(6) - (6)].msg);
     ;}
     break;
 
   case 5:
 #line 65 "flex_bison/defs/emp.y"
     {
-        (yyval.msg) = malloc(sizeof(RawMsg));
-        (yyval.msg)->name = (yyvsp[(2) - (4)].id);
-        (yyval.msg)->parent = 0;
-        (yyval.msg)->lineList = (yyvsp[(4) - (4)].msgLineList);
+        (yyvsp[(4) - (4)].msg)->name = (yyvsp[(2) - (4)].id);
+        (yyval.msg) = (yyvsp[(4) - (4)].msg);
     ;}
     break;
 
   case 6:
-#line 75 "flex_bison/defs/emp.y"
+#line 73 "flex_bison/defs/emp.y"
     {
-        (yyval.msgLineList) = malloc(sizeof(ListNode));
-        (yyval.msgLineList)->data = (void*) (yyvsp[(1) - (1)].line);
-        (yyval.msgLineList)->next = 0;
+        (yyval.msg) = addLine(0, (yyvsp[(1) - (1)].msgLine));
     ;}
     break;
 
   case 7:
-#line 81 "flex_bison/defs/emp.y"
+#line 77 "flex_bison/defs/emp.y"
     {
-        listAdd((yyvsp[(1) - (2)].msgLineList),(void*) (yyvsp[(2) - (2)].line));
-        (yyval.msgLineList) = (yyvsp[(1) - (2)].msgLineList);
+        (yyval.msg) = addLine((yyvsp[(1) - (2)].msg), (yyvsp[(2) - (2)].msgLine));
     ;}
     break;
 
   case 8:
-#line 89 "flex_bison/defs/emp.y"
+#line 84 "flex_bison/defs/emp.y"
     {
-        ReportInterface *reportInterface;
-        reportInterface = malloc(sizeof(ReportInterface));
-        reportInterface->reportType = REPORT_RAM;
-        reportInterface->name = (yyvsp[(3) - (3)].id);
-        
-        (yyval.line) = malloc(sizeof(Line));
-        (yyval.line)->lineType = REPORT_INTERFACE;
-        (yyval.line)->data = (void*) reportInterface;
+        (yyval.msgLine) = createReportInterface(REPORT_RAM, (yyvsp[(3) - (3)].id));
     ;}
     break;
 
   case 9:
-#line 100 "flex_bison/defs/emp.y"
+#line 88 "flex_bison/defs/emp.y"
     {
-        ReportInterface *reportInterface;
-        reportInterface = malloc(sizeof(ReportInterface));
-        reportInterface->reportType = REPORT_RECORD;
-        reportInterface->name = (yyvsp[(3) - (3)].id);
-        
-        (yyval.line) = malloc(sizeof(Line));
-        (yyval.line)->lineType = REPORT_INTERFACE;
-        (yyval.line)->data = (void*) reportInterface;
+        (yyval.msgLine) = createReportInterface(REPORT_RECORD, (yyvsp[(3) - (3)].id));
     ;}
     break;
 
   case 10:
-#line 111 "flex_bison/defs/emp.y"
+#line 92 "flex_bison/defs/emp.y"
     {
-        ControlFieldDef *controlDef;
-        controlDef = malloc(sizeof(ControlFieldDef));
-        controlDef->name = (yyvsp[(1) - (3)].id);
-        controlDef->val = num2bin((yyvsp[(3) - (3)].id));
-        
-        (yyval.line) = malloc(sizeof(Line));
-        (yyval.line)->lineType = CONTROL_FIELD_DEF;
-        (yyval.line)->data = (void*) controlDef;
+        (yyval.msgLine) = createMsgField((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].bitFieldList));
     ;}
     break;
 
   case 11:
-#line 122 "flex_bison/defs/emp.y"
+#line 96 "flex_bison/defs/emp.y"
     {
-        ReportFieldDef *reportDef;
-        reportDef = malloc(sizeof(ReportFieldDef));
-        reportDef->name = (yyvsp[(2) - (2)].id);
-        
-        (yyval.line) = malloc(sizeof(Line));
-        (yyval.line)->lineType = REPORT_FIELD_DEF;
-        (yyval.line)->data = (void*) reportDef;
+        (yyval.msgLine) = createMatchCondition((yyvsp[(1) - (3)].id), (yyvsp[(3) - (3)].val));
     ;}
     break;
 
   case 12:
-#line 132 "flex_bison/defs/emp.y"
+#line 100 "flex_bison/defs/emp.y"
     {
-        MsgFieldDef *fieldDef;
-        fieldDef = malloc(sizeof(MsgFieldDef));
-        fieldDef->name = (yyvsp[(1) - (3)].id);
-        fieldDef->bitFields = (yyvsp[(3) - (3)].bitFieldList);
-        
-        (yyval.line) = malloc(sizeof(Line));
-        (yyval.line)->lineType = MSG_FIELD_DEF;
-        (yyval.line)->data = (void*) fieldDef;
+        (yyval.msgLine) = createReportField((yyvsp[(2) - (2)].id));
     ;}
     break;
 
   case 13:
-#line 146 "flex_bison/defs/emp.y"
+#line 107 "flex_bison/defs/emp.y"
     {
-        BitField *bitField;
-        bitField = collectBitField((yyvsp[(1) - (1)].id));
-        (yyval.bitFieldList) = malloc(sizeof(ListNode));
-        (yyval.bitFieldList)->data = (void*) bitField;
-        (yyval.bitFieldList)->next = 0;
+        (yyval.bitFieldList) = createLinkedList(&copyRef, &deleteBitField, &compareBitField);
+        appendLinkedList((yyval.bitFieldList), (void*) (yyvsp[(1) - (1)].bitField));
     ;}
     break;
 
   case 14:
-#line 154 "flex_bison/defs/emp.y"
+#line 112 "flex_bison/defs/emp.y"
     {
-        BitField *bitField;
-        bitField = collectBitField((yyvsp[(3) - (3)].id));
-        listAdd((yyvsp[(1) - (3)].bitFieldList), (void*) bitField);
+        appendLinkedList((yyvsp[(1) - (3)].bitFieldList), (void*) (yyvsp[(3) - (3)].bitField));
         (yyval.bitFieldList) = (yyvsp[(1) - (3)].bitFieldList);
     ;}
     break;
 
 
 /* Line 1267 of yacc.c.  */
-#line 1505 "emp.tab.c"
+#line 1461 "emp.tab.c"
       default: break;
     }
   YY_SYMBOL_PRINT ("-> $$ =", yyr1[yyn], &yyval, &yyloc);
@@ -1715,10 +1671,10 @@ yyreturn:
 }
 
 
-#line 162 "flex_bison/defs/emp.y"
+#line 118 "flex_bison/defs/emp.y"
 
 
-void yyerror(ListNode **msgList, char const *s) {
+void yyerror(LinkedList **msgList, char const *s) {
     fprintf(stderr, "%s\n", s);
 }
 

@@ -72,18 +72,19 @@
 
 #if ! defined YYSTYPE && ! defined YYSTYPE_IS_DECLARED
 typedef union YYSTYPE
-#line 12 "flex_bison/defs/emp.y"
+#line 13 "flex_bison/defs/emp.y"
 {
     //Lexer
     char *id; //An ID's c-string representation.
+    char *val; //Binary representation of a match condition's value.
+    BitField *bitField;
     //Parser
-    ListNode *bitFieldList;
-    Line *line;
-    ListNode *msgLineList;
-    RawMsg *msg;
+    LinkedList *bitFieldList;
+    MsgLine *msgLine;
+    Msg *msg;
 }
 /* Line 1529 of yacc.c.  */
-#line 87 "emp.tab.h"
+#line 88 "emp.tab.h"
 	YYSTYPE;
 # define yystype YYSTYPE /* obsolescent; will be withdrawn */
 # define YYSTYPE_IS_DECLARED 1
